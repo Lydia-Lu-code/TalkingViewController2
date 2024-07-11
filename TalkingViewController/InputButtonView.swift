@@ -1,4 +1,3 @@
-
 import UIKit
 
 protocol InputButtonViewDelegate: AnyObject {
@@ -40,30 +39,21 @@ class InputButtonView: UIView {
     }
 
     private func setupView() {
-        leftButton1.backgroundColor = .systemGreen
-        leftButton1.setTitle("Button 1", for: .normal)
+        leftButton1.setImage(UIImage(systemName: "plus"), for: .normal)
         leftButton1.translatesAutoresizingMaskIntoConstraints = false
 
-        leftButton2.backgroundColor = .systemYellow
-        leftButton2.setTitle("Button 2", for: .normal)
+        leftButton2.setImage(UIImage(systemName: "camera"), for: .normal)
         leftButton2.translatesAutoresizingMaskIntoConstraints = false
-
-        leftButton3.backgroundColor = .systemOrange
-        leftButton3.setTitle("Button 3", for: .normal)
+        
+        leftButton3.setImage(UIImage(systemName: "photo"), for: .normal)
         leftButton3.translatesAutoresizingMaskIntoConstraints = false
-
-        collapseButton.backgroundColor = .systemBlue
-        collapseButton.setTitle("Collapse", for: .normal)
-        collapseButton.addTarget(self, action: #selector(collapseButtonTapped), for: .touchUpInside)
-        collapseButton.translatesAutoresizingMaskIntoConstraints = false
-        collapseButton.heightAnchor.constraint(equalTo: collapseButton.widthAnchor).isActive = true
 
         textField.translatesAutoresizingMaskIntoConstraints = false
 
-        rightButton.backgroundColor = .systemBlue
-        rightButton.setTitle("Send", for: .normal)
+        rightButton.setImage(UIImage(systemName: "mic"), for: .normal)
         rightButton.translatesAutoresizingMaskIntoConstraints = false
 
+//        stackView.alignment = .bottom
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -74,6 +64,8 @@ class InputButtonView: UIView {
         stackView.addArrangedSubview(rightButton)
         addSubview(stackView)
 
+        stackView.backgroundColor = .darkGray
+        
         NSLayoutConstraint.activate([
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -89,6 +81,10 @@ class InputButtonView: UIView {
             leftButton3.heightAnchor.constraint(equalTo: heightAnchor),
             leftButton3.widthAnchor.constraint(equalTo: leftButton3.heightAnchor),
 
+            textField.topAnchor.constraint(equalTo: stackView.topAnchor),
+            textField.bottomAnchor.constraint(equalTo: stackView.bottomAnchor),
+            textField.heightAnchor.constraint(equalTo: leftButton1.heightAnchor),
+
             rightButton.heightAnchor.constraint(equalTo: heightAnchor),
             rightButton.widthAnchor.constraint(equalTo: leftButton1.heightAnchor),
         ])
@@ -97,6 +93,41 @@ class InputButtonView: UIView {
         textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
 
+    //﻿ ﻿調整按鈕縮放
+    
+    @objc private func keyboardWillShow(notification: Notification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        keyboardHeight = keyboardFrame.height
+        delegate?.keyboardWillShow(height: keyboardHeight)
+
+        // 改變按鈕1和按鈕2的透明度
+        leftButton1.alpha = 0
+        leftButton2.alpha = 0
+
+        // 改變 leftButton3 的圖像
+        leftButton3.setImage(UIImage(systemName: "chevron.right"), for: .normal)
+
+        if !isCollapsed {
+            collapseButtonTapped()
+        }
+    }
+
+    @objc private func keyboardWillHide(notification: Notification) {
+        delegate?.keyboardWillHide()
+
+        // 恢復按鈕1和按鈕2的透明度
+        leftButton1.alpha = 1
+        leftButton2.alpha = 1
+
+        // 恢復 leftButton3 的圖像
+        leftButton3.setImage(UIImage(systemName: "photo"), for: .normal)
+
+        if isCollapsed {
+            collapseButtonTapped()
+        }
+    }
+
+    
     @objc private func collapseButtonTapped() {
         isCollapsed.toggle()
         UIView.animate(withDuration: 0.3) {
@@ -112,18 +143,7 @@ class InputButtonView: UIView {
                 self.stackView.insertArrangedSubview(self.leftButton3, at: 2)
             }
             self.stackView.layoutIfNeeded()
-            self.collapseButton.setTitle(self.isCollapsed ? "Expand" : "Collapse", for: .normal)
         }
-    }
-
-    @objc private func keyboardWillShow(notification: Notification) {
-        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        keyboardHeight = keyboardFrame.height
-        delegate?.keyboardWillShow(height: keyboardHeight)
-    }
-
-    @objc private func keyboardWillHide(notification: Notification) {
-        delegate?.keyboardWillHide()
     }
 }
 
