@@ -1,10 +1,3 @@
-//
-//  TalkersCell.swift
-//  TalkersViewController
-//
-//  Created by Lydia Lu on 2024/7/9.
-//
-
 import UIKit
 
 class TalkerCell: UITableViewCell {
@@ -12,7 +5,7 @@ class TalkerCell: UITableViewCell {
     let profileImageView: UIImageView = {
         let img = UIImageView()
         img.translatesAutoresizingMaskIntoConstraints = false
-        img.contentMode = .scaleAspectFit
+        img.contentMode = .scaleAspectFill
         img.layer.cornerRadius = 25
         img.clipsToBounds = true
         return img
@@ -42,14 +35,12 @@ class TalkerCell: UITableViewCell {
         return label
     }()
     
-    
     var isIncoming: Bool = true {
         didSet {
             updateConstraintsForDirection()
             updateColorsForDirection()
         }
     }
-
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -58,11 +49,6 @@ class TalkerCell: UITableViewCell {
         contentView.addSubview(nameLabel)
         contentView.addSubview(bubbleBackgroundView)
         bubbleBackgroundView.addSubview(messageLabel)
-        
-        print("Subviews added")
-        for subview in contentView.subviews {
-            print("Subview: \(subview)")
-        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -70,36 +56,15 @@ class TalkerCell: UITableViewCell {
     }
     
     func configure(with message: String, image: UIImage?, isIncoming: Bool, name: String? = nil) {
-        if messageLabel.text != message {
-            messageLabel.text = message
-        }
-        if profileImageView.image != image {
-            profileImageView.image = image
-        }
+        messageLabel.text = message
         self.isIncoming = isIncoming
-
-        if isIncoming {
-            nameLabel.text = name ?? "Unknown"
-        } else {
-            nameLabel.text = nil
-        }
-
-        print("Configured: nameLabel.text = \(String(describing: nameLabel.text))")
+        nameLabel.text = isIncoming ? name ?? "Unknown" : nil
+        profileImageView.image = isIncoming ? image : nil
     }
     
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        messageLabel.text = nil
-        profileImageView.image = nil
-        nameLabel.text = nil
-    }
+
     
     private func updateConstraintsForDirection() {
-        NSLayoutConstraint.deactivate(profileImageView.constraints)
-        NSLayoutConstraint.deactivate(bubbleBackgroundView.constraints)
-        NSLayoutConstraint.deactivate(messageLabel.constraints)
-        NSLayoutConstraint.deactivate(nameLabel.constraints)
         
         if isIncoming {
             NSLayoutConstraint.activate([
@@ -120,33 +85,29 @@ class TalkerCell: UITableViewCell {
                 messageLabel.leadingAnchor.constraint(equalTo: bubbleBackgroundView.leadingAnchor, constant: 8),
                 messageLabel.trailingAnchor.constraint(equalTo: bubbleBackgroundView.trailingAnchor, constant: -8),
                 messageLabel.topAnchor.constraint(equalTo: bubbleBackgroundView.topAnchor, constant: 8),
-                messageLabel.bottomAnchor.constraint(equalTo: bubbleBackgroundView.bottomAnchor, constant: -8),
-                
+                messageLabel.bottomAnchor.constraint(equalTo: bubbleBackgroundView.bottomAnchor, constant: -8)
             ])
         } else {
             NSLayoutConstraint.activate([
                 bubbleBackgroundView.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: 100),
                 bubbleBackgroundView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-                bubbleBackgroundView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-                bubbleBackgroundView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+                bubbleBackgroundView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+                bubbleBackgroundView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
                 
                 messageLabel.leadingAnchor.constraint(equalTo: bubbleBackgroundView.leadingAnchor, constant: 8),
                 messageLabel.trailingAnchor.constraint(equalTo: bubbleBackgroundView.trailingAnchor, constant: -8),
                 messageLabel.topAnchor.constraint(equalTo: bubbleBackgroundView.topAnchor, constant: 8),
-                messageLabel.bottomAnchor.constraint(equalTo: bubbleBackgroundView.bottomAnchor, constant: -8),
+                messageLabel.bottomAnchor.constraint(equalTo: bubbleBackgroundView.bottomAnchor, constant: -8)
             ])
         }
-//        print("Cell height: \(self.frame.height)")
-        print("Constraints updated")
     }
     
     private func updateColorsForDirection() {
-        if isIncoming {
-            // left
-            profileImageView.backgroundColor = .yellow
-            bubbleBackgroundView.backgroundColor = .blue
-        } else {
-            bubbleBackgroundView.backgroundColor = .green
-        }
+        bubbleBackgroundView.backgroundColor = isIncoming ? UIColor(white: 0.95, alpha: 1) : UIColor.systemBlue
+        messageLabel.textColor = isIncoming ? .black : .white
     }
 }
+
+
+
+
