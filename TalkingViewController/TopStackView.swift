@@ -7,7 +7,7 @@ class TopStackView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         label.font = UIFont.boldSystemFont(ofSize: 18)
-        label.text = "Title"
+        label.text = "Alice"
         return label
     }()
     
